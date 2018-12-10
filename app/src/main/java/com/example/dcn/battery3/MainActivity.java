@@ -5,15 +5,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
 
 import static android.content.ContentValues.TAG;
@@ -23,7 +29,8 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
     PowerManager.WakeLock mWakeLock;
     TextView mNoticeText;
     private SeekBar seekBar;
-
+    static MediaPlayer mMediaPlayer;
+    static Vibrator vibrator;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +73,47 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         SharedPreferences.Editor editor = getSharedPreferences("notice", MODE_PRIVATE).edit();
         editor.putString("noticeNum",mNoticeText.getText().toString());
         editor.commit();
+    }
+
+    public static void StopRing(){
+        if (mMediaPlayer != null &&mMediaPlayer.isPlaying()){
+            mMediaPlayer.stop();
+            mMediaPlayer = null;
+        }
+        if (vibrator != null){
+            vibrator.cancel();
+            vibrator = null;
+        }
+    }
+
+    public static void PlayRing(final Context context) {
+        Log.e("ee", "正在响铃");
+        // 使用来电铃声的铃声路径
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        try {
+            mMediaPlayer = new MediaPlayer();
+            mMediaPlayer.setDataSource(context, uri);
+            mMediaPlayer.setLooping(true); //循环播放
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        vibrator = (Vibrator)context.getSystemService(context.VIBRATOR_SERVICE);
+        long[] patter = {1000, 1000, 2000, 2000};
+        vibrator.vibrate(patter, 0);
+
     }
 
     @Override

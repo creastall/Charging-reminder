@@ -4,11 +4,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.widget.TextView;
 
 public class BatteryReceiver extends BroadcastReceiver {
     private TextView pow;
+
 
     public BatteryReceiver(TextView pow) {
         this.pow = pow;
@@ -19,8 +23,9 @@ public class BatteryReceiver extends BroadcastReceiver {
         String name = intent.getAction();
         System.out.println("接收广播："+name);
         switch (name) {
-            case Intent.ACTION_POWER_CONNECTED:
+            case Intent.ACTION_POWER_CONNECTED: {
                 NoticeCenter.sendNotice(R.mipmap.ic_launcher, "", "正在充电", "", context);
+            }
                 break;
             case Intent.ACTION_BATTERY_CHANGED:
                 int current = intent.getExtras().getInt("level");// 获得当前电量
@@ -31,13 +36,16 @@ public class BatteryReceiver extends BroadcastReceiver {
                 String numString = read.getString("noticeNum","80");
                 if (state == BatteryManager.BATTERY_STATUS_CHARGING && percent >= Integer.parseInt(numString)) {
                     NoticeCenter.sendNotice(R.mipmap.ic_launcher, "", "电量:" + percent + "%", "该拔掉电源了", context);
+                    MainActivity.PlayRing(context);
                 }
                 if (pow != null) {
                     pow.setText(percent + "%");
                 }
                 break;
-            case Intent.ACTION_POWER_DISCONNECTED:
+            case Intent.ACTION_POWER_DISCONNECTED: {
                 NoticeCenter.sendNotice(R.mipmap.ic_launcher, "", "断开充电", "", context);
+                MainActivity.StopRing();
+            }
                 break;
         }
 
