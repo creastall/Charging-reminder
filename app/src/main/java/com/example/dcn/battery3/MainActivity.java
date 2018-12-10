@@ -76,7 +76,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
     }
 
     public static void StopRing(){
-        if (mMediaPlayer != null &&mMediaPlayer.isPlaying()){
+        if (mMediaPlayer != null ){
             mMediaPlayer.stop();
             mMediaPlayer = null;
         }
@@ -87,6 +87,9 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
     }
 
     public static void PlayRing(final Context context) {
+        if (mMediaPlayer != null && mMediaPlayer.isPlaying()){
+            return;
+        }
         Log.e("ee", "正在响铃");
         // 使用来电铃声的铃声路径
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
